@@ -66,9 +66,9 @@ def submit_job(pdb_receptor, pdb_file, ligand_sequence, simulation_cycles=5):
     return re.search('href="(.+)"', response.text).groups()[0]
 
 
-def get_pdb_file(pdb_receptor):
+def get_pdb_file(pdb_receptor, base_dir):
     pdb_code = pdb_receptor.split(':')[0]
-    pdb_file = pdb_code + '.pdb'
+    pdb_file = os.path.join(base_dir, pdb_code + '.pdb')
     if not os.path.exists(pdb_file):
         download_file(
             (PDB_DOWNLOAD_URL + '?fileFormat=pdb&compression=NO'
@@ -82,6 +82,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print 'Syntax:\n /cabsdock.py ligand pdb_codes_file'
     else:
+        base_dir = os.path.dirname(sys.argv[2])
         with open(sys.argv[2]) as pdb_codes_file:
             pdb_codes = pdb_codes_file.read().splitlines()
             ligand = sys.argv[1]
@@ -89,6 +90,6 @@ if __name__ == '__main__':
                 raise ValueError('Ligand must contain at least 4 residues.')
 
             for pdb_receptor in pdb_codes:
-                pdb_file = get_pdb_file(pdb_receptor)
+                pdb_file = get_pdb_file(pdb_receptor, base_dir)
                 job_url = submit_job(pdb_receptor, pdb_file, ligand)
                 print LTB_URL + job_url

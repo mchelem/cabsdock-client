@@ -7,14 +7,12 @@ import time
 import requests
 
 
-def download_file(url, filename=None):
+def download_file(url, filename):
     """Download a file from a given URL.
 
     :param url: The URL for the file to be downloaded.
     """
     response = requests.get(url, stream=True)
-    if filename is None:
-        filename = os.path.basename(url)
     with open(filename, 'wb') as f:
         for chunk in response.iter_content(chunk_size=1024):
             if chunk:  # filter out keep-alive new chunks
@@ -22,7 +20,7 @@ def download_file(url, filename=None):
                 f.flush()
 
 
-def fetch_results(job_urls):
+def fetch_results(job_urls, base_dir):
     """Fetch the docking results for a list of jobs.
 
     :param job_urls: List of URLs for the jobs to be downloaded.
@@ -46,7 +44,8 @@ def fetch_results(job_urls):
         elif 'done' in status:
             print url, 'done, download started...'
             results_url = url.replace('/job/', '/job/CABSdock_')[:-1] + '.zip'
-            download_file(results_url)
+            filename = os.path.join(base_dir, os.path.basename(results_url))
+            download_file(results_url, filename)
             job_urls.remove(url)
             print url, 'results download finished.'
     return job_urls
@@ -56,12 +55,13 @@ if __name__ == '__main__':
     if len(sys.argv) < 1:
         print 'Syntax:\n cabsfetch.py job_urls_file'
     else:
+        base_dir = os.path.dirname(sys.argv[1])
         with open(sys.argv[1]) as urls_file:
             job_urls = urls_file.read().splitlines()
             while len(job_urls) > 0:
                 print '-' * 80
                 print 'Retrieving results for %d jobs...' % len(job_urls)
-                job_urls = fetch_results(job_urls)
+                job_urls = fetch_results(job_urls, base_dir)
                 # Sleep a while before polling again
                 if len(job_urls) > 0:
                     time.sleep(60)
