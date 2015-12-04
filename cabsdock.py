@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 
+import os
 import re
 import sys
 import requests
+from cabsfetch import download_file
 
 
-CABS_ENDPOINT = 'http://biocomp.chem.uw.edu.pl/CABSdock'
+LTB_URL = 'http://biocomp.chem.uw.edu.pl'
+CABS_URL = LTB_URL + '/CABSdock'
+PDB_DOWNLOAD_URL = 'http://www.rcsb.org/pdb/download/downloadFile.do'
 
 
 def get_csrf_token(html_content):
@@ -32,7 +36,7 @@ def submit_job(pdb_receptor, pdb_file, ligand_sequence, simulation_cycles=5):
     :return: URL to query the submitted job.
     """
     # Get cookie from home page
-    response = requests.get(CABS_ENDPOINT)
+    response = requests.get(CABS_URL)
     response.raise_for_status()
     cookies = response.cookies
 
@@ -53,7 +57,7 @@ def submit_job(pdb_receptor, pdb_file, ligand_sequence, simulation_cycles=5):
 
     files = {'receptor_file': open(pdb_file, 'rb')}
     response = requests.post(
-        CABS_ENDPOINT, data=params, files=files,
+        CABS_URL, data=params, files=files,
         cookies=cookies, allow_redirects=False
     )
     response.raise_for_status()
@@ -62,9 +66,21 @@ def submit_job(pdb_receptor, pdb_file, ligand_sequence, simulation_cycles=5):
     return re.search('href="(.+)"', response.text).groups()[0]
 
 
+def get_pdb_file(pdb_receptor):
+    pdb_code = pdb_receptor.split(':')[0]
+    pdb_file = pdb_code + '.pdb'
+    if not os.path.exists(pdb_file):
+        download_file(
+            (PDB_DOWNLOAD_URL + '?fileFormat=pdb&compression=NO'
+                '&structureId=' + pdb_code),
+            pdb_file
+        )
+    return pdb_file
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print 'Syntax:\n /cabs-dock.py ligand pdb_codes_file'
+        print 'Syntax:\n /cabsdock.py ligand pdb_codes_file'
     else:
         with open(sys.argv[2]) as pdb_codes_file:
             pdb_codes = pdb_codes_file.read().splitlines()
@@ -73,6 +89,6 @@ if __name__ == '__main__':
                 raise ValueError('Ligand must contain at least 4 residues.')
 
             for pdb_receptor in pdb_codes:
-                pdb_file = pdb_receptor.split(':')[0] + '.pdb'
+                pdb_file = get_pdb_file(pdb_receptor)
                 job_url = submit_job(pdb_receptor, pdb_file, ligand)
-                print 'http://biocomp.chem.uw.edu.pl' + job_url
+                print pdb_receptor + ': ' + LTB_URL + job_url

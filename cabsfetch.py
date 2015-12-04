@@ -7,13 +7,15 @@ import time
 import requests
 
 
-def download_file(url):
+def download_file(url, filename=None):
     """Download a file from a given URL.
 
     :param url: The URL for the file to be downloaded.
     """
     response = requests.get(url, stream=True)
-    with open(os.path.basename(url), 'wb') as f:
+    if filename is None:
+        filename = os.path.basename(url)
+    with open(filename, 'wb') as f:
         for chunk in response.iter_content(chunk_size=1024):
             if chunk:  # filter out keep-alive new chunks
                 f.write(chunk)
@@ -52,7 +54,7 @@ def fetch_results(job_urls):
 
 if __name__ == '__main__':
     if len(sys.argv) < 1:
-        print 'Syntax:\n cabs-fetch-results.py job_urls_file'
+        print 'Syntax:\n cabsfetch.py job_urls_file'
     else:
         with open(sys.argv[1]) as urls_file:
             job_urls = urls_file.read().splitlines()
