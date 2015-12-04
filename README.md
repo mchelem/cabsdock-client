@@ -10,11 +10,13 @@ Automate the submission of jobs to the [CABS-dock server for flexible protein-pe
 ./cabsdock.py SFGDGFADF pdb_codes.txt
 ```
 
-* SFGDGFADF is the ligand sequence
+* SFGDGFADF is the ligand sequence.
 
 * pdb_codes.txt is a file containing the pdb receptors, one per line.
 
-The output is the URL of the created jobs.
+If the PDB file is not found in the current directory, it will be downloaded from the PDB.
+
+The output is the URLs for the submitted jobs.
 You can redirect the output to a file in order to use it later with cabsdownload.
 
 ### Download results:
