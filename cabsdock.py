@@ -25,7 +25,7 @@ def get_csrf_token(html_content):
     ).groups()[0]
 
 
-def submit_job(pdb_receptor, pdb_file, ligand_sequence, simulation_cycles=5):
+def submit_job(pdb_receptor, pdb_file, ligand_sequence, simulation_cycles=50):
     """Submit a job to the CASB-dock server.
 
     :param pdb_receptor: PDB code (and chain) for the receptor.
