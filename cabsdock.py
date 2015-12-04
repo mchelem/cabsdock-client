@@ -4,7 +4,7 @@ import os
 import re
 import sys
 import requests
-from cabsfetch import download_file
+from cabsdownload import download_file
 
 
 LTB_URL = 'http://biocomp.chem.uw.edu.pl'
