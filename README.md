@@ -17,7 +17,7 @@ Automate the submission of jobs to the [CABS-dock server for flexible protein-pe
 If the PDB file is not found in the current directory, it will be downloaded from the PDB.
 
 The output is the URLs for the submitted jobs.
-You can redirect the output to a file in order to use it later with cabsdownload.
+You can **redirect the output** to a file in order to use it later with cabsdownload.
 
 ### Download results:
 
