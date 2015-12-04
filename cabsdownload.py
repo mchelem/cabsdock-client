@@ -63,4 +63,5 @@ if __name__ == '__main__':
                 print 'Retrieving results for %d jobs...' % len(job_urls)
                 job_urls = fetch_results(job_urls)
                 # Sleep a while before polling again
-                time.sleep(60)
+                if len(job_urls) > 0:
+                    time.sleep(60)

@@ -91,4 +91,4 @@ if __name__ == '__main__':
             for pdb_receptor in pdb_codes:
                 pdb_file = get_pdb_file(pdb_receptor)
                 job_url = submit_job(pdb_receptor, pdb_file, ligand)
-                print pdb_receptor + ': ' + LTB_URL + job_url
+                print LTB_URL + job_url
